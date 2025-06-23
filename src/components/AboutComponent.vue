@@ -3,29 +3,29 @@
     class="isolate overflow-hidden bg-[#EBEBEA] pt-0 pb-0 -mt-6 md:-mt-8 lg:-mt-10"
     id="about"
   >
-    <div class="relative mx-auto max-w-7xl pt-0 px-6 mb-32 lg:px-8">
-      <figure class="grid grid-cols-1 lg:grid-cols-2 items-center gap-8 lg:gap-16">
+    <div class="relative mx-auto max-w-7xl pt-0 px-4 sm:px-6 lg:px-8 mb-24 md:mb-32">
+      <figure class="grid grid-cols-1 lg:grid-cols-2 items-center gap-12 md:gap-16">
         <!-- Heading and Image Section -->
-        <div class="relative px-4 md:px-14" ref="imageContainer">
+        <div class="relative px-4 sm:px-8 md:px-14" ref="imageContainer">
           <p
-            class="font-inter font-semibold text-[25px] md:text-[45px] text-[#030303] text-center md:text-left mb-6"
+            class="font-inter font-semibold text-[24px] sm:text-[32px] md:text-[40px] lg:text-[45px] text-[#030303] text-center md:text-left mb-6"
           >
             about me
           </p>
 
-          <div class="flex justify-start">
+          <div class="flex justify-center md:justify-start">
             <img
               src="/ikshita.png"
               alt="Ikshita"
-              class="w-64 h-64 object-cover rounded-[5%] shadow-lg"
+              class="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 object-cover rounded-[5%] shadow-lg"
             />
           </div>
         </div>
 
         <!-- Text Section -->
-        <div class="lg:max-w-9xl lg:mt-16">
+        <div class="lg:max-w-9xl lg:mt-16 px-4 sm:px-6 md:px-0">
           <blockquote
-            class="font-inter text-right text-[14px] lg:text-[14px] text-[#F1F1F1] py-4 relative"
+            class="font-inter text-right text-[14px] md:text-[15px] lg:text-[16px] text-[#F1F1F1] py-4 relative"
             ref="paragraphsContainer"
           >
             <!-- Paragraph 1 -->
@@ -35,7 +35,7 @@
                 :style="{ opacity: paragraphOpacity[0] }"
               ></div>
               <p
-                class="pb-16 text-[#030303] transition-opacity duration-700 ease-in-out pr-6"
+                class="pb-10 sm:pb-12 md:pb-16 text-[#030303] transition-opacity duration-700 ease-in-out pr-4 sm:pr-6"
                 :style="{ opacity: paragraphOpacity[0] }"
                 ref="firstParagraph"
               >
@@ -51,12 +51,12 @@
                 :style="{ opacity: paragraphOpacity[1] }"
               ></div>
               <p
-                class="pb-16 text-[#030303] transition-opacity duration-700 ease-in-out pr-6"
+                class="pb-10 sm:pb-12 md:pb-16 text-[#030303] transition-opacity duration-700 ease-in-out pr-4 sm:pr-6"
                 :style="{ opacity: paragraphOpacity[1] }"
                 ref="secondParagraph"
               >
-               My passions bounce between UI/UX design, cybersecurity, AI, 
-               and the occasional game dev rabbit hole because why stick to one world when you can explore them all?
+                My passions bounce between UI/UX design, cybersecurity, AI, 
+                and the occasional game dev rabbit hole because why stick to one world when you can explore them all?
               </p>
             </div>
 
@@ -67,7 +67,7 @@
                 :style="{ opacity: paragraphOpacity[2] }"
               ></div>
               <p
-                class="transition-opacity text-[#030303] duration-700 ease-in-out pr-6"
+                class="transition-opacity text-[#030303] duration-700 ease-in-out pr-4 sm:pr-6"
                 :style="{ opacity: paragraphOpacity[2] }"
                 ref="thirdParagraph"
               >
@@ -92,15 +92,25 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: -40px;
+  margin-top: -30px;
+  padding-bottom: 24px;
   position: relative;
-  z-index: 20;
+  z-index: 0;
+  pointer-events: none; /* Allow interaction to pass through */
 }
 
 .spinner {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   animation: spin 8s linear infinite;
+  pointer-events: none; /* Make spinner not block Spline */
+}
+
+@media (min-width: 768px) {
+  .spinner {
+    width: 80px;
+    height: 80px;
+  }
 }
 
 @keyframes spin {
@@ -124,9 +134,6 @@ const thirdParagraph = ref(null)
 const paragraphOpacity = ref([1, 1, 1])
 
 const handleScroll = () => {
-  const aboutSection = document.getElementById('about')
-  if (!aboutSection || !imageContainer.value) return
-
   const paragraphs = [firstParagraph.value, secondParagraph.value, thirdParagraph.value]
   const viewportHeight = window.innerHeight
   const visibilityStart = viewportHeight * 0.9

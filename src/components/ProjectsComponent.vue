@@ -45,9 +45,9 @@
     <div class="projects-wrapper">
       <!-- Project heading that only shows within this section -->
       <div class="projects-heading w-full">
-        <div class="max-w-6xl mx-auto flex items-center mb-8 px-4">
+        <div class="heading-container">
           <div class="relative">
-            <p class="font-inter text-[45px] font-semibold text-[#EBEBEA] text-left">
+            <p class="heading-text">
               my projects
             </p>
           </div>
@@ -64,21 +64,20 @@
       >
         <div class="project-content">
           <div class="project-image">
-            <img src="" alt="Fitness app using ML" />
+            <img src="/Fitfy.jpg" alt="Fitness app using ML" />
           </div>
           <div class="project-info">
             <h2 class="project-title">Fitify</h2>
             <p class="project-description">
-              An app where one can keep a track of the exercises live.
+              An app where one can keep a track of the exercises live using machine learning and computer vision.
             </p>
             <div class="tech-stack">
               <span>ML</span>
-              <span>python</span>
+              <span>Python</span>
+              <span>OpenCV</span>
             </div>
             <div class="project-links">
-              <a href="" class="project-link"
-                >Go to GitHub →</a
-              >
+              <a href="#" class="project-link">Go to GitHub →</a>
             </div>
           </div>
         </div>
@@ -92,26 +91,25 @@
         :data-shadow-color="projectColors[1].shadow"
         data-project-index="1"
       >
-        <div class="project-content">
+        <div class="project-content reverse">
           <div class="project-info">
             <h2 class="project-title">Peer-to-peer notes</h2>
             <p class="project-description">
-              A serverless note sharing app 
+              A serverless note sharing app that enables real-time collaboration without traditional servers.
             </p>
             <div class="tech-stack">
               <span>CSS</span>
-              <span>Typescript</span>
+              <span>TypeScript</span>
               <span>Python</span>
+              <span>WebRTC</span>
             </div>
             <div class="project-links">
-              <a href="" class="project-link"
-                >Go to GitHub →</a
-              >
-              <a href="" class="project-link">Check it out →</a>
+              <a href="#" class="project-link">Go to GitHub →</a>
+              <a href="#" class="project-link">Check it out →</a>
             </div>
           </div>
           <div class="project-image">
-            <img src="" alt="Note sharing " />
+            <img src="/peertopeer.png" alt="Note sharing app" />
           </div>
         </div>
       </div>
@@ -126,21 +124,21 @@
       >
         <div class="project-content">
           <div class="project-image">
-            <img src="" alt="Wardrobe app" />
+            <img src="/ensemble.webp" alt="Wardrobe app" />
           </div>
           <div class="project-info">
             <h2 class="project-title">Ensemble</h2>
             <p class="project-description">
-              A platform where AI suggests outfits, based on your available clothes.
+              A platform where AI suggests outfits based on your available clothes, weather, and personal style preferences.
             </p>
             <div class="tech-stack">
               <span>Tailwind CSS</span>
               <span>Node.js</span>
+              <span>AI/ML</span>
             </div>
             <div class="project-links">
-              <a href="" class="project-link"
-                >Go to GitHub →</a>
-              </div>
+              <a href="#" class="project-link">Go to GitHub →</a>
+            </div>
           </div>
         </div>
       </div>
@@ -203,17 +201,33 @@ onMounted(() => {
   const projectContainer = document.querySelector('.project-container')
   const blobGroups = document.querySelectorAll('.blob-group')
 
+  // Check if device is mobile
+  const isMobile = () => window.innerWidth < 768
+  const isTablet = () => window.innerWidth >= 768 && window.innerWidth < 1024
+
   // Randomly position blobs within each group
   blobGroups.forEach((group) => {
     const blobs = group.querySelectorAll('.blob')
 
     blobs.forEach((blob) => {
-      // Random positions - more concentrated toward the center
-      const topPos = Math.random() * 50 + 20 // 20% to 70% from top
-      const leftPos = Math.random() * 50 + 20 // 20% to 70% from left
+      // Adjust blob positioning based on screen size
+      let topPos, leftPos, size
 
-      // Random size between 400px and 700px - larger than before
-      const size = Math.random() * 300 + 400
+      if (isMobile()) {
+        // More spread out positioning for mobile to avoid clustering
+        topPos = Math.random() * 60 + 10 // 10% to 70% from top
+        leftPos = Math.random() * 60 + 10 // 10% to 70% from left
+        size = Math.random() * 200 + 250 // Smaller blobs for mobile
+      } else if (isTablet()) {
+        topPos = Math.random() * 50 + 15 // 15% to 65% from top
+        leftPos = Math.random() * 50 + 15 // 15% to 65% from left
+        size = Math.random() * 250 + 300 // Medium blobs for tablet
+      } else {
+        // Desktop positioning (original)
+        topPos = Math.random() * 50 + 20 // 20% to 70% from top
+        leftPos = Math.random() * 50 + 20 // 20% to 70% from left
+        size = Math.random() * 300 + 400 // Large blobs for desktop
+      }
 
       // Apply random position and size
       blob.style.top = `${topPos}%`
@@ -252,41 +266,60 @@ onMounted(() => {
 
   // Function to handle scroll event
   const handleScroll = () => {
-    // Get the current scroll position
+    // Skip complex animations on mobile for performance
+    if (isMobile()) {
+      // Simplified mobile scroll handling
+      const scrollPosition = window.scrollY
+      const windowHeight = window.innerHeight
+      const projectsContainerRect = projectContainer.getBoundingClientRect()
+      const projectsContainerTop = window.scrollY + projectsContainerRect.top
+
+      if (scrollPosition < projectsContainerTop - windowHeight / 2) return
+
+      // Simple section detection for mobile
+      projectSections.forEach((section, index) => {
+        const sectionTop = projectsContainerTop + section.offsetTop
+        const sectionHeight = section.offsetHeight
+
+        if (scrollPosition >= sectionTop - windowHeight / 2 && scrollPosition < sectionTop + sectionHeight) {
+          if (activeProjectIndex.value !== index) {
+            activeProjectIndex.value = index
+            projectContainer.style.backgroundColor = projectColors.value[index].bg
+            currentTextColor.value = projectColors.value[index].text
+            currentTextShadow.value = projectColors.value[index].shadow
+
+            // Update blob visibility
+            blobGroups.forEach((group, groupIndex) => {
+              group.style.opacity = groupIndex === index ? 1 : 0
+            })
+          }
+        }
+      })
+      return
+    }
+
+    // Full desktop scroll handling (original logic)
     const scrollPosition = window.scrollY
     const windowHeight = window.innerHeight
-
-    // Get projects container position
     const projectsContainerRect = projectContainer.getBoundingClientRect()
     const projectsContainerTop = window.scrollY + projectsContainerRect.top
 
-    // Only apply color transitions when we're actually in the projects section
     if (scrollPosition < projectsContainerTop - windowHeight / 2) return
 
-    // Check each project section
     projectSections.forEach((section, index) => {
-      // Get section position relative to document
       const sectionTop = projectsContainerTop + section.offsetTop
       const sectionHeight = section.offsetHeight
       const sectionBottom = sectionTop + sectionHeight
-
-      // Calculate how far through this section we've scrolled (0 to 1)
       const scrollProgress = (scrollPosition - sectionTop) / sectionHeight
 
-      // If we're in or near this section
       if (scrollPosition >= sectionTop - windowHeight / 2 && scrollPosition < sectionBottom) {
-        // Update active project for animations
         activeProjectIndex.value = index
-
-        // Flag for transitioning effect to show both sets of blobs during transition
         isTransitioning.value = scrollProgress > 0.2 && scrollProgress < 0.8
 
-        // Get colors for current and next section
         const currentColor = projectColors.value[index].bg
         const curTextColor = projectColors.value[index].text
         const curShadowColor = projectColors.value[index].shadow
 
-        // Determine next colors (if there's a next section)
         let nextColor = currentColor
         let nextTextColor = curTextColor
         let nextShadowColor = curShadowColor
@@ -296,20 +329,12 @@ onMounted(() => {
           nextTextColor = projectColors.value[index + 1].text
           nextShadowColor = projectColors.value[index + 1].shadow
         } else if (projectColors.value[index].nextColor) {
-          // For the last section, use nextColor if defined
           nextColor = projectColors.value[index].nextColor
         }
 
-        // Calculate color transition based on scroll progress
         if (scrollProgress >= 0 && scrollProgress <= 1) {
-          // Transition background color
-          projectContainer.style.backgroundColor = lerpColor(
-            currentColor,
-            nextColor,
-            scrollProgress,
-          )
+          projectContainer.style.backgroundColor = lerpColor(currentColor, nextColor, scrollProgress)
 
-          // Update heading colors
           if (scrollProgress > 0.5) {
             currentTextColor.value = nextTextColor
             currentTextShadow.value = nextShadowColor
@@ -318,7 +343,6 @@ onMounted(() => {
             currentTextShadow.value = curShadowColor
           }
 
-          // Update blob opacity based on scroll position
           blobGroups.forEach((group, groupIndex) => {
             if (groupIndex === index) {
               group.style.opacity = 1 - scrollProgress
@@ -345,7 +369,7 @@ onMounted(() => {
     }
   })
 
-  // Setup Intersection Observer to trigger animations and handle initial colors
+  // Setup Intersection Observer
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -354,16 +378,13 @@ onMounted(() => {
           activeProjectIndex.value = index
           isTransitioning.value = false
 
-          // Force immediate color update when a section becomes visible
           currentTextColor.value = projectColors.value[index].text
           currentTextShadow.value = projectColors.value[index].shadow
 
-          // Also update background color when first entering the projects section
           if (index === 0) {
             projectContainer.style.backgroundColor = projectColors.value[0].bg
           }
 
-          // Update active blob group
           blobGroups.forEach((group, groupIndex) => {
             if (groupIndex === index) {
               group.style.opacity = 1
@@ -375,8 +396,8 @@ onMounted(() => {
       })
     },
     {
-      threshold: 0.2,
-      rootMargin: '-10% 0px -10% 0px', // Trigger a bit before element is fully visible
+      threshold: isMobile() ? 0.1 : 0.2,
+      rootMargin: isMobile() ? '-5% 0px -5% 0px' : '-10% 0px -10% 0px',
     },
   )
 
@@ -388,28 +409,64 @@ onMounted(() => {
   // Initial call to handle the scroll position on page load
   handleScroll()
 
-  // Make sure projects take up full viewport height
+  // Make sure projects take up appropriate height
   const adjustProjectHeight = () => {
     const vh = window.innerHeight
     projectSections.forEach((section) => {
-      section.style.height = `${vh}px`
+      // On mobile, allow natural content height with minimum
+      if (isMobile()) {
+        section.style.minHeight = `${Math.max(vh * 0.8, 600)}px`
+        section.style.height = 'auto'
+      } else {
+        section.style.height = `${vh}px`
+      }
     })
   }
 
   // Initial height adjustment
   adjustProjectHeight()
 
-  // Adjust on window resize
-  window.addEventListener('resize', adjustProjectHeight)
+  // Adjust on window resize with debouncing
+  let resizeTimeout
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout)
+    resizeTimeout = setTimeout(() => {
+      adjustProjectHeight()
+      // Reposition blobs on resize
+      blobGroups.forEach((group) => {
+        const blobs = group.querySelectorAll('.blob')
+        blobs.forEach((blob) => {
+          let topPos, leftPos, size
+
+          if (isMobile()) {
+            topPos = Math.random() * 60 + 10
+            leftPos = Math.random() * 60 + 10
+            size = Math.random() * 200 + 250
+          } else if (isTablet()) {
+            topPos = Math.random() * 50 + 15
+            leftPos = Math.random() * 50 + 15
+            size = Math.random() * 250 + 300
+          } else {
+            topPos = Math.random() * 50 + 20
+            leftPos = Math.random() * 50 + 20
+            size = Math.random() * 300 + 400
+          }
+
+          blob.style.top = `${topPos}%`
+          blob.style.left = `${leftPos}%`
+          blob.style.width = `${size}px`
+          blob.style.height = `${size}px`
+        })
+      })
+    }, 250)
+  })
 
   // Add enhanced floating animation to the blobs
   document.querySelectorAll('.blob').forEach((blob) => {
-    // Different animation duration for each blob to create organic movement
-    // Shorter durations for more visible movement
-    const duration = 12 + Math.random() * 10
+    // Reduce animation intensity on mobile for performance
+    const duration = isMobile() ? 15 + Math.random() * 5 : 12 + Math.random() * 10
     const delay = Math.random() * 3
 
-    // Apply the animation with ease-in-out for smoother movement
     blob.style.animation = `float ${duration}s ease-in-out ${delay}s infinite alternate`
   })
 })
@@ -424,19 +481,26 @@ onMounted(() => {
   z-index: 1;
   margin: 0;
   padding: 0;
-  margin-top: -15px; /* Extended negative margin to pull up over previous section */
-  padding-top: 100px; 
+  margin-top: -15px;
+  padding-top: 60px;
 }
 
-/* Add pseudo-element to extend black background upward */
+/* Mobile adjustments */
+@media (max-width: 767px) {
+  .project-container {
+    margin-top: -10px;
+    padding-top: 40px;
+  }
+}
+
 .project-container::before {
   content: '';
   position: absolute;
-  top: -100px; 
+  top: -100px;
   left: 0;
   right: 0;
   height: 100px;
-  background-color: #030303; /* Match your first project bg color */
+  background-color: #030303;
   z-index: -1;
 }
 
@@ -479,6 +543,13 @@ onMounted(() => {
   opacity: 1;
 }
 
+/* Reduce blur on mobile for performance */
+@media (max-width: 767px) {
+  .blob {
+    filter: blur(30px);
+  }
+}
+
 @keyframes float {
   0% {
     transform: translate(0, 0) scale(1);
@@ -488,6 +559,21 @@ onMounted(() => {
   }
   100% {
     transform: translate(-30px, 30px) scale(0.95);
+  }
+}
+
+/* Reduce float animation on mobile */
+@media (max-width: 767px) {
+  @keyframes float {
+    0% {
+      transform: translate(0, 0) scale(1);
+    }
+    50% {
+      transform: translate(15px, -15px) scale(1.05);
+    }
+    100% {
+      transform: translate(-15px, 15px) scale(0.98);
+    }
   }
 }
 
@@ -501,15 +587,58 @@ onMounted(() => {
 .projects-heading {
   position: sticky;
   top: 0;
-  padding: 2rem 1rem;
   width: 100%;
   z-index: 10;
   pointer-events: none;
-  transition:
-    color 0.8s ease,
-    text-shadow 0.8s ease;
-  padding-left: 4px;
-  padding-right: 14px;
+  transition: color 0.8s ease, text-shadow 0.8s ease;
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .projects-heading {
+    padding: 2rem 1rem;
+  }
+}
+
+.heading-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+@media (min-width: 1024px) {
+  .heading-container {
+    padding: 0 2rem;
+  }
+}
+
+.heading-text {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #ebebea;
+  text-align: left;
+  line-height: 1.2;
+  margin: 0;
+}
+
+@media (min-width: 480px) {
+  .heading-text {
+    font-size: 2.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .heading-text {
+    font-size: 3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .heading-text {
+    font-size: 3.5rem;
+  }
 }
 
 .project-section {
@@ -518,7 +647,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  padding: 1rem;
   position: relative;
   overflow: hidden;
   transition: opacity 0.5s ease;
@@ -526,65 +655,156 @@ onMounted(() => {
   border: none;
 }
 
+@media (min-width: 768px) {
+  .project-section {
+    padding: 2rem;
+  }
+}
+
+/* Mobile: stack content vertically */
 .project-content {
   max-width: 1200px;
   width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
   align-items: center;
   z-index: 5;
+  text-align: center;
+}
+
+/* Tablet and up: side by side layout */
+@media (min-width: 768px) {
+  .project-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    text-align: left;
+  }
+  
+  .project-content.reverse {
+    direction: rtl;
+  }
+  
+  .project-content.reverse > * {
+    direction: ltr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .project-content {
+    gap: 3rem;
+  }
 }
 
 /* Project info styling */
 .project-info {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 500px;
+}
+
+@media (min-width: 768px) {
+  .project-info {
+    max-width: none;
+  }
 }
 
 .project-title {
-  font-size: 20px;
+  font-size: 2.5rem;
   font-weight: 600;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1rem;
   color: #ebebea;
 }
 
+@media (min-width: 768px) {
+  .project-title {
+    font-size: 3.25rem;
+    margin-bottom: 1.2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .project-title {
+    font-size: 4rem;
+  }
+}
+
 .project-description {
-  font-size: 14px;
+  font-size: 1.5rem;
   line-height: 1.6;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   color: #ebebea;
+}
+
+@media (min-width: 768px) {
+  .project-description {
+    font-size: 1.75rem;
+    margin-bottom: 2rem;
+  }
 }
 
 .tech-stack {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.8rem;
-  margin-bottom: 2rem;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .tech-stack {
+    gap: 0.8rem;
+    margin-bottom: 2rem;
+    justify-content: flex-start;
+  }
 }
 
 .tech-stack span {
   background-color: #ebebea;
   color: #030303;
-  padding: 0.4rem 0.8rem;
+  padding: 0.5rem 1rem;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 1.25rem;
   font-weight: 500;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .tech-stack span {
+    padding: 0.6rem 1.2rem;
+    font-size: 1.4rem;
+  }
 }
 
 .project-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 1.5rem;
+  gap: 1rem;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .project-links {
+    gap: 1.5rem;
+    justify-content: flex-start;
+  }
 }
 
 .project-link {
   color: white;
   text-decoration: none;
-  font-size: 14px;
+  font-size: 1.4rem;
   font-weight: 600;
   transition: all 0.3s ease;
   white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .project-link {
+    font-size: 1.6rem;
+  }
 }
 
 .project-link:hover {
@@ -596,19 +816,68 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  line-height: 0; 
+  line-height: 0;
+  width: 100%;
+  max-width: 400px;
+}
+
+@media (min-width: 768px) {
+  .project-image {
+    max-width: none;
+  }
 }
 
 .project-image img {
   width: 100%;
-  max-width: 500px;
-  border-radius: 5px;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
   transition: transform 0.5s ease;
-  display: block; /* Remove inline spacing */
+  display: block;
   vertical-align: top;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-.project-section:hover .project-image img {
-  transform: translateY(-5px);
+@media (min-width: 768px) {
+  .project-image img {
+    max-width: 500px;
+    border-radius: 10px;
+  }
+}
+
+/* Disable hover effects on touch devices */
+@media (hover: hover) {
+  .project-section:hover .project-image img {
+    transform: translateY(-5px);
+  }
+}
+
+/* Performance optimizations for mobile */
+@media (max-width: 767px) {
+  .project-container {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+  
+  .blob {
+    will-change: transform;
+  }
+  
+  .project-image img {
+    will-change: auto;
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .blob {
+    animation: none !important;
+  }
 }
 </style>

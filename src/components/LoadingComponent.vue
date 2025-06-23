@@ -19,14 +19,11 @@ const props = defineProps({
   },
 })
 
-// Animated progress bar
 const progress = ref(0)
-const interval = ref(null)
+let interval = null
 
 onMounted(() => {
-  // Start the progress animation
-  interval.value = setInterval(() => {
-    // Slow down as we approach 90%
+  interval = setInterval(() => {
     if (progress.value < 90) {
       progress.value += Math.random() * 10
     } else {
@@ -35,33 +32,27 @@ onMounted(() => {
 
     if (progress.value >= 99) {
       progress.value = 99
-      clearInterval(interval.value)
+      clearInterval(interval)
     }
   }, 200)
 })
 
-// When loading is complete, jump to 100%
 watch(
   () => props.isLoading,
-  (newValue) => {
-    if (!newValue) {
+  (newVal) => {
+    if (!newVal) {
       progress.value = 100
-      if (interval.value) {
-        clearInterval(interval.value)
-      }
+      if (interval) clearInterval(interval)
     }
   },
-  { immediate: true },
+  { immediate: true }
 )
 </script>
 
 <style scoped>
 .loading-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
   background-color: #030303;
   display: flex;
   justify-content: center;
@@ -80,13 +71,12 @@ watch(
 
 .loading-text {
   font-family: 'Inter', sans-serif;
-  color:rgb(194, 91, 253);
+  color: rgb(194, 91, 253);
   letter-spacing: 0.1rem;
   text-align: center;
 }
 
 .loading-progress-container {
-  position: relative;
   width: 250px;
   height: 3px;
   background-color: rgba(255, 255, 255, 0.2);
@@ -94,33 +84,25 @@ watch(
   overflow: hidden;
 }
 
-/* Base progress bar with subtle glow */
 .loading-progress-bar {
-  position: relative;
   height: 100%;
-  background-color:rgb(210, 91, 253);
+  background-color: rgb(210, 91, 253);
   border-radius: 2px;
   transition: width 0.3s ease;
-  overflow: hidden;
-  box-shadow: 0 0 6px 0 rgba(253, 91, 98, 0.6);
+  position: relative;
+  box-shadow: 0 0 6px rgba(253, 91, 98, 0.6);
 }
 
-/* The shine effect */
 .loading-progress-bar::after {
   content: '';
   position: absolute;
   top: 0;
   left: -50px;
-  width: 20px; /* Slightly smaller shine width for thinner bar */
+  width: 20px;
   height: 100%;
-  background: linear-gradient(
-    to right,
-    rgba(255, 255, 255, 0),
-    rgba(255, 255, 255, 0.8),
-    rgba(255, 255, 255, 0)
-  );
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.8), transparent);
   animation: progress-shine 2s linear infinite;
-  box-shadow: 0 0 10px 3px rgba(255, 255, 255, 0.5); /* Reduced shadow for thinner bar */
+  box-shadow: 0 0 10px 3px rgba(255, 255, 255, 0.5);
 }
 
 @keyframes progress-shine {
@@ -134,7 +116,7 @@ watch(
 
 @media (max-width: 768px) {
   .loading-text {
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
 
   .loading-progress-container {
@@ -142,3 +124,4 @@ watch(
   }
 }
 </style>
+

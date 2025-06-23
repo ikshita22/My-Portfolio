@@ -12,9 +12,7 @@
       <AboutComponent />
       <TechComponent />
       <ProjectsComponent />
-      <OtherProjectsComponent />
       <ExperienceComponent />
-      <ContentComponent />
       <FooterComponent />
     </div>
   </div>
@@ -37,6 +35,7 @@ const preloadImages = () => {
   // List of key images to preload
   const imagesToPreload = [
   '/abstract.jpg',
+  '/Hello.png',
   '/gradient.jpg',
   '/ikshita.png',
   '/itcat.png',
